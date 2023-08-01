@@ -1,5 +1,11 @@
 const previousValueDisplay = document.querySelector(".previous-value");
 const currentValueDisplay =  document.querySelector(".current-value");
+const numbers = document.querySelectorAll(".number");
+const operators = document.querySelectorAll(".operator");
+const equals = document.querySelector(".equals");
+const clear = document.querySelectorAll(".clear");
+const backspace = document.querySelector(".backspace");
+const signChange = document.querySelector(".sign")
 let equation = [];
 let newNumberFlag = false;
 let lastOperator = null;
@@ -7,11 +13,6 @@ let result;
 let newResult;
 let newClickedNumber;
 let previousEquation = [];
-const numbers = document.querySelectorAll(".number");
-const operators = document.querySelectorAll(".operator");
-const equals = document.querySelector(".equals");
-const clear = document.querySelectorAll(".clear");
-const backspace = document.querySelector(".backspace");
 
 numbers.forEach(number => {
     number.addEventListener("click", event => {
@@ -26,15 +27,15 @@ numbers.forEach(number => {
         } else {
             currentValueDisplay.textContent = currentValueDisplay.textContent == 0 ? clickedNumber :`${currentValueDisplay.textContent}${clickedNumber}`;
         }
-    })
-})
+    });
+});
 
 operators.forEach(operator => {
     operator.addEventListener("click", event => {
 
         const operator = event.target.textContent;
         const currentValue = currentValueDisplay.textContent;
-        
+
         if (newNumberFlag) {
             previousValueDisplay.textContent = "";
             equation = [];
@@ -54,8 +55,8 @@ operators.forEach(operator => {
             lastOperator = operator;
             return newNumberFlag = true;
         }
-    })
-})
+    });
+});
 
 equals.addEventListener("click", () => {
 
@@ -86,7 +87,7 @@ equals.addEventListener("click", () => {
     }
     equation = [];
     newNumberFlag = true;
-})
+});
 
 clear.forEach(btn => {
     btn.addEventListener("click", event => {
@@ -97,8 +98,8 @@ clear.forEach(btn => {
             previousEquation = [];
             newNumberFlag = false;
         }
-    })
-})
+    });
+});
 
 backspace.addEventListener("click", () => {
     if (previousEquation.length) {
@@ -110,7 +111,13 @@ backspace.addEventListener("click", () => {
             currentValueDisplay.textContent = currentValueDisplay.textContent.slice(0, -1);
         }
     }
-})
+});
+
+signChange.addEventListener("click", () => {
+    currentValueDisplay.textContent = Number(currentValueDisplay.textContent) * -1;
+    result = Number(result) * -1;
+    newClickedNumber = Number(newClickedNumber) * -1;
+});
 
 function calculate(operand1, operator, operand2) {
     operand1 = Number(operand1);
@@ -128,4 +135,4 @@ function calculate(operand1, operator, operand2) {
         result = operand2 != 0 ? operand1 / operand2 : "Cannot divide by zero";
     }
     return result;
-}
+};
