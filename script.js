@@ -1,18 +1,25 @@
 const previousValueDisplay = document.querySelector(".previous-value");
 const currentValueDisplay =  document.querySelector(".current-value");
-let equation = []; //stores previous value (value displayed in history)
+let equation = [];
 let newNumberFlag = false;
 let lastOperator = null;
+let result;
+let newResult;
+let newClickedNumber;
+let previousEquation = [];
 const numbers = document.querySelectorAll(".number");
 const operators = document.querySelectorAll(".operator");
 const equals = document.querySelector(".equals");
+const clear = document.querySelectorAll(".clear");
+const backspace = document.querySelector(".backspace");
 
 numbers.forEach(number => {
     number.addEventListener("click", event => {
         const clickedNumber = event.target.textContent;
         if (newNumberFlag && !equation.length) {
             previousValueDisplay.textContent = "\u00A0"
-            currentValueDisplay.textContent = clickedNumber;
+            currentValueDisplay.textContent = currentValueDisplay.textContent == result ? clickedNumber :`${currentValueDisplay.textContent}${clickedNumber}`;
+            newClickedNumber = currentValueDisplay.textContent;
         } else if (newNumberFlag) {
             currentValueDisplay.textContent = clickedNumber;
             newNumberFlag = false;
@@ -25,15 +32,13 @@ numbers.forEach(number => {
 operators.forEach(operator => {
     operator.addEventListener("click", event => {
 
+        const operator = event.target.textContent;
+        const currentValue = currentValueDisplay.textContent;
+        
         if (newNumberFlag) {
             previousValueDisplay.textContent = "";
             equation = [];
         }
-
-        const operator = event.target.textContent;
-        const currentValue = currentValueDisplay.textContent;
-
-        if (!equation.length && currentValue == 0) return;
 
         if (!equation.length) {
             equation.push(currentValue, operator);
@@ -52,20 +57,24 @@ operators.forEach(operator => {
     })
 })
 
-let result;
-let newResult;
-let previousEquation = [];
-
 equals.addEventListener("click", () => {
 
-    if (!equation.length && previousEquation.length) {
-    equation = [...previousEquation]
-    newResult = calculate(result, equation[1], equation[2]);
-    currentValueDisplay.textContent = newResult;
-    previousValueDisplay.textContent = `${result} ${equation[1]} ${equation[2]} =`;
-    previousEquation = [];
-    previousEquation.push(result, equation[1], equation[2]);
-    result = newResult;
+    if (!equation.length && previousEquation.length && currentValueDisplay.textContent == result) {
+        equation = [...previousEquation]
+        newResult = calculate(result, equation[1], equation[2]);
+        currentValueDisplay.textContent = newResult;
+        previousValueDisplay.textContent = `${result} ${equation[1]} ${equation[2]} =`;
+        previousEquation = [];
+        previousEquation.push(result, equation[1], equation[2]);
+        result = newResult;
+    } else if (!equation.length && previousEquation.length) {
+        equation = [...previousEquation]
+        newResult = calculate(newClickedNumber, equation[1], equation[2]);
+        currentValueDisplay.textContent = newResult;
+        previousValueDisplay.textContent = `${newClickedNumber} ${equation[1]} ${equation[2]} =`;
+        previousEquation = [];
+        previousEquation.push(newClickedNumber, equation[1], equation[2]);
+        result = newResult;
     } else if (!equation.length)  {
         previousValueDisplay.textContent = `${currentValueDisplay.textContent} =`;
     } else if (equation.length) {
@@ -77,6 +86,30 @@ equals.addEventListener("click", () => {
     }
     equation = [];
     newNumberFlag = true;
+})
+
+clear.forEach(btn => {
+    btn.addEventListener("click", event => {
+        currentValueDisplay.textContent = "0";
+        if (event.target.classList.contains("all")) {
+            previousValueDisplay.textContent = "\u00A0";
+            equation = [];
+            previousEquation = [];
+            newNumberFlag = false;
+        }
+    })
+})
+
+backspace.addEventListener("click", () => {
+    if (previousEquation.length) {
+        previousValueDisplay.textContent = "\u00A0";
+    } else {
+        if (currentValueDisplay.textContent.length == 1) {
+            currentValueDisplay.textContent = "0";
+        } else {
+            currentValueDisplay.textContent = currentValueDisplay.textContent.slice(0, -1);
+        }
+    }
 })
 
 function calculate(operand1, operator, operand2) {
