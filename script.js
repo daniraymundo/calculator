@@ -39,11 +39,15 @@ numbers.forEach(number => {
     });
 });
 
+function removeTrailingDecimal(str) {
+    return str.endsWith(".") ? str.slice(0,-1) : str;
+}
+
 operators.forEach(operator => {
     operator.addEventListener("click", event => {
 
         const operator = event.target.textContent;
-        const currentValue = currentValueDisplay.textContent;
+        let currentValue = currentValueDisplay.textContent;
 
         if (divideByZeroFlag) return;
 
@@ -53,20 +57,20 @@ operators.forEach(operator => {
         }
 
         if (!equation.length) {
+            currentValue = removeTrailingDecimal(currentValue);
             equation.push(currentValue, operator);
             previousValueDisplay.textContent = `${currentValue} ${operator}`;
-            lastOperator = operator;
-            newNumberFlag = true;
         } else {
+            currentValue = removeTrailingDecimal(currentValue);
             equation.push(currentValue);
             const result = calculate(equation[0], equation[1], equation[2]);
             currentValueDisplay.textContent = result;
             previousValueDisplay.textContent = `${result} ${operator}`;
             equation = [result, operator];
-            lastOperator = operator;
-            newNumberFlag = true;
         }
         isDecimalClicked = false;
+        lastOperator = operator;
+        newNumberFlag = true;
     });
 });
 
@@ -91,7 +95,7 @@ equals.addEventListener("click", () => {
     } else if (!equation.length)  {
         previousValueDisplay.textContent = `${currentValueDisplay.textContent} =`;
     } else if (equation.length) {
-        equation.push(currentValueDisplay.textContent);
+        equation.push(removeTrailingDecimal(currentValueDisplay.textContent));
         result = calculate(equation[0], equation[1], equation[2]);
         currentValueDisplay.textContent = result;
         previousValueDisplay.textContent = `${equation[0]} ${equation[1]} ${equation[2]} =`;
@@ -117,7 +121,7 @@ clear.forEach(btn => {
 });
 
 backspace.addEventListener("click", () => {
-    if (currentValueDisplay.textContent = "Cannot divide by zero") {
+    if (currentValueDisplay.textContent === "Cannot divide by zero") {
         currentValueDisplay.textContent = "0";
         previousValueDisplay.textContent = "\u00A0";
         equation = []
@@ -148,6 +152,7 @@ decimal.addEventListener ("click", event => {
         currentValueDisplay.textContent = "0";
         previousValueDisplay.textContent = "\u00A0";
     }
+
     if (!isDecimalClicked) {
         currentValueDisplay.textContent += event.target.textContent
     }
