@@ -5,7 +5,8 @@ const operators = document.querySelectorAll(".operator");
 const equals = document.querySelector(".equals");
 const clear = document.querySelectorAll(".clear");
 const backspace = document.querySelector(".backspace");
-const signChange = document.querySelector(".sign")
+const signChange = document.querySelector(".sign");
+const decimal = document.querySelector(".decimal");
 let equation = [];
 let newNumberFlag = false;
 let lastOperator = null;
@@ -13,19 +14,27 @@ let result;
 let newResult;
 let newClickedNumber;
 let previousEquation = [];
+let isDecimalClicked = false;
+let divideByZeroFlag = false;
 
 numbers.forEach(number => {
     number.addEventListener("click", event => {
         const clickedNumber = event.target.textContent;
         if (newNumberFlag && !equation.length) {
             previousValueDisplay.textContent = "\u00A0"
-            currentValueDisplay.textContent = currentValueDisplay.textContent == result ? clickedNumber :`${currentValueDisplay.textContent}${clickedNumber}`;
+            currentValueDisplay.textContent = 
+                currentValueDisplay.textContent == result 
+                    ? clickedNumber 
+                    :`${currentValueDisplay.textContent}${clickedNumber}`;
             newClickedNumber = currentValueDisplay.textContent;
         } else if (newNumberFlag) {
             currentValueDisplay.textContent = clickedNumber;
             newNumberFlag = false;
         } else {
-            currentValueDisplay.textContent = currentValueDisplay.textContent == 0 ? clickedNumber :`${currentValueDisplay.textContent}${clickedNumber}`;
+            currentValueDisplay.textContent = 
+                currentValueDisplay.textContent == "0" 
+                    ? clickedNumber 
+                    :`${currentValueDisplay.textContent}${clickedNumber}`;
         }
     });
 });
@@ -36,6 +45,8 @@ operators.forEach(operator => {
         const operator = event.target.textContent;
         const currentValue = currentValueDisplay.textContent;
 
+        if (divideByZeroFlag) return;
+
         if (newNumberFlag) {
             previousValueDisplay.textContent = "";
             equation = [];
@@ -45,7 +56,7 @@ operators.forEach(operator => {
             equation.push(currentValue, operator);
             previousValueDisplay.textContent = `${currentValue} ${operator}`;
             lastOperator = operator;
-            return newNumberFlag = true;
+            newNumberFlag = true;
         } else {
             equation.push(currentValue);
             const result = calculate(equation[0], equation[1], equation[2]);
@@ -53,13 +64,14 @@ operators.forEach(operator => {
             previousValueDisplay.textContent = `${result} ${operator}`;
             equation = [result, operator];
             lastOperator = operator;
-            return newNumberFlag = true;
+            newNumberFlag = true;
         }
+        isDecimalClicked = false;
     });
 });
 
 equals.addEventListener("click", () => {
-
+    if (divideByZeroFlag) return;
     if (!equation.length && previousEquation.length && currentValueDisplay.textContent == result) {
         equation = [...previousEquation]
         newResult = calculate(result, equation[1], equation[2]);
@@ -87,6 +99,7 @@ equals.addEventListener("click", () => {
     }
     equation = [];
     newNumberFlag = true;
+    isDecimalClicked = false;
 });
 
 clear.forEach(btn => {
@@ -97,11 +110,20 @@ clear.forEach(btn => {
             equation = [];
             previousEquation = [];
             newNumberFlag = false;
+            isDecimalClicked = false;
         }
+        divideByZeroFlag = false;
     });
 });
 
 backspace.addEventListener("click", () => {
+    if (currentValueDisplay.textContent = "Cannot divide by zero") {
+        currentValueDisplay.textContent = "0";
+        previousValueDisplay.textContent = "\u00A0";
+        equation = []
+        previousEquation = []
+        newNumberFlag = false;
+    }
     if (previousEquation.length) {
         previousValueDisplay.textContent = "\u00A0";
     } else {
@@ -111,6 +133,8 @@ backspace.addEventListener("click", () => {
             currentValueDisplay.textContent = currentValueDisplay.textContent.slice(0, -1);
         }
     }
+    isDecimalClicked = false;
+    divideByZeroFlag = false;
 });
 
 signChange.addEventListener("click", () => {
@@ -119,6 +143,16 @@ signChange.addEventListener("click", () => {
     newClickedNumber = Number(newClickedNumber) * -1;
 });
 
+decimal.addEventListener ("click", event => {
+    if (!equation.length && previousEquation.length && !isDecimalClicked) {
+        currentValueDisplay.textContent = "0";
+        previousValueDisplay.textContent = "\u00A0";
+    }
+    if (!isDecimalClicked) {
+        currentValueDisplay.textContent += event.target.textContent
+    }
+    isDecimalClicked = true;
+})
 function calculate(operand1, operator, operand2) {
     operand1 = Number(operand1);
     operand2 = Number(operand2);
@@ -132,7 +166,12 @@ function calculate(operand1, operator, operand2) {
     } else if (operator === "x") {
         result = operand1 * operand2;
     } else if (operator === "÷") {
-        result = operand2 != 0 ? operand1 / operand2 : "Cannot divide by zero";
+        if (operand2 == "0") {
+            result = "Cannot divide by zero";
+            divideByZeroFlag = true;
+        } else {
+            result = operand1 / operand2;
+        }
     }
     return result;
 };
