@@ -17,6 +17,27 @@ let previousEquation = [];
 let isDecimalClicked = false;
 let divideByZeroFlag = false;
 
+function removeTrailingDecimal(str) {
+    return str.endsWith(".") ? str.slice(0,-1) : str;
+}
+
+function limitDigits(number, maxDigits) {
+    const numToStr = number.toString();
+
+    if (numToStr.length > maxDigits) {
+        const [integerPart, decimalPart] = numToStr.split(".");
+
+        if (decimalPart) {
+            const maxDecimalLength = maxDigits - integerPart.length - 1; 
+            const roundedDecimalPart = parseFloat(`0.${decimalPart}`).toFixed(maxDecimalLength).split(".")[1];
+            return (`${integerPart}.${roundedDecimalPart}`);
+        } else {
+            return parseFloat(integerPart.slice(0, maxDigits));
+        }
+    }
+    return numToStr;
+}
+
 numbers.forEach(number => {
     number.addEventListener("click", event => {
         const clickedNumber = event.target.textContent;
@@ -25,23 +46,19 @@ numbers.forEach(number => {
             currentValueDisplay.textContent = 
                 currentValueDisplay.textContent == result 
                     ? clickedNumber 
-                    :`${currentValueDisplay.textContent}${clickedNumber}`;
+                    : limitDigits(`${currentValueDisplay.textContent}${clickedNumber}`, 13);
             newClickedNumber = currentValueDisplay.textContent;
         } else if (newNumberFlag) {
-            currentValueDisplay.textContent = clickedNumber;
+            currentValueDisplay.textContent = (clickedNumber);
             newNumberFlag = false;
         } else {
             currentValueDisplay.textContent = 
                 currentValueDisplay.textContent == "0" 
                     ? clickedNumber 
-                    :`${currentValueDisplay.textContent}${clickedNumber}`;
+                    : limitDigits(`${currentValueDisplay.textContent}${clickedNumber}`, 13);
         }
     });
 });
-
-function removeTrailingDecimal(str) {
-    return str.endsWith(".") ? str.slice(0,-1) : str;
-}
 
 operators.forEach(operator => {
     operator.addEventListener("click", event => {
@@ -142,9 +159,9 @@ backspace.addEventListener("click", () => {
 });
 
 signChange.addEventListener("click", () => {
-    currentValueDisplay.textContent = Number(currentValueDisplay.textContent) * -1;
-    result = Number(result) * -1;
-    newClickedNumber = Number(newClickedNumber) * -1;
+    currentValueDisplay.textContent = parseFloat(currentValueDisplay.textContent) * -1;
+    result = parseFloat(result) * -1;
+    newClickedNumber = parseFloat(newClickedNumber) * -1;
 });
 
 decimal.addEventListener ("click", event => {
@@ -159,8 +176,8 @@ decimal.addEventListener ("click", event => {
     isDecimalClicked = true;
 })
 function calculate(operand1, operator, operand2) {
-    operand1 = Number(operand1);
-    operand2 = Number(operand2);
+    operand1 = parseFloat(operand1);
+    operand2 = parseFloat(operand2);
 
     let result;
 
@@ -172,11 +189,16 @@ function calculate(operand1, operator, operand2) {
         result = operand1 * operand2;
     } else if (operator === "÷") {
         if (operand2 == "0") {
-            result = "Cannot divide by zero";
             divideByZeroFlag = true;
+            return "Cannot divide by zero";
         } else {
             result = operand1 / operand2;
         }
     }
-    return result;
-};
+
+    if (Math.abs(result) >= 1e+16) {
+        return result.toExponential(6);
+    } else {
+        return limitDigits(result, 13);
+    }
+}
