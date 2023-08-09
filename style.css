@@ -1,4 +1,4 @@
-:root {
+    :root {
     font-size: 62.5%;
 }
  
@@ -33,11 +33,11 @@ body {
 }
 
 .previous-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
 
 .current-value {
-    font-size: 2.9rem;
+    font-size: 3.5rem;
 }
 
 .button-container {
