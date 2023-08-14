@@ -1,7 +1,20 @@
-    :root {
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@200;300;400;500;600&display=swap');
+
+:root {
     font-size: 62.5%;
+    background: #bdc3c7;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #2c3e50, #bdc3c7);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #2c3e50, #bdc3c7); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: white;
+    font-family: "Barlow", Arial, sans-serif;
+    --bgcolor1: #282828;
+    --bgcolor2: #404040;
+    --accent-color1: rgb(255, 89, 90);
+    --accent-color2: rgba(255, 89, 90, 0.5);
+    --accent-color3: rgb(0, 76, 116);
 }
- 
+
+
 body {
     display: flex;
     justify-content: center;
@@ -20,24 +33,32 @@ body {
     justify-content: center;
     border: 1px solid black;
     gap: 1.5rem;
-    padding: 2.5rem;
+    padding: 2rem;
+    border: 0px;
+    border-radius: 0.75rem;
+    background-color: var(--bgcolor1);
+    width: 250px;
 }
 
 .display-container {
-    border: 1px solid black;
+    border: 0px;
+    border-radius: 0.5rem;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     padding: 0.5rem;
+    background-color:var(--bgcolor2);
 }
 
 .previous-value {
     font-size: 1.5rem;
+    font-weight: 300;
 }
 
 .current-value {
-    font-size: 3.5rem;
+    font-size: 2.5rem;
+    font-weight: 600;
 }
 
 .button-container {
@@ -45,11 +66,27 @@ body {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(5, 1fr);
     gap: 0.8rem;
+    margin-top: 0.75rem;
+    width: 100%;
 }
 
 button {
-    font-size: 1.75rem;
-    padding: 1.5rem;
+    font-size: 1.75em;
+    padding: 1em;
+    background-color: var(--bgcolor2);
+    border-radius: 0.5rem;
+    border: 0px;
+    color: white;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.number:hover,
+.decimal:hover,
+.sign:hover {
+    background-color: #6a6a6a;
 }
 
 .backspace {
@@ -58,8 +95,45 @@ button {
     justify-content: center;
 }
 
+.equals {
+    background-color: var(--accent-color1);
+    color: black;
+}
+
+.operator {
+    background-color: var(--accent-color2);
+    color: black;
+}
+
+.equals:hover,
+.operator:hover {
+    background-color: #FF898A;
+}
+
+.clear,
+.backspace {
+    background-color: var(--accent-color3);
+    color: black;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.clear:hover,
+.backspace:hover {
+    background-color: #0079A8;
+}
+
+.decimal,
+.sign {
+    background-color: rgba(64, 64, 64, 0.65);
+}
+
 footer {
     position: fixed;
     bottom: 0;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    color: var(--bgcolor1)
+}
+
+a:visited {
+    color: var(--accent-color3)
 }
