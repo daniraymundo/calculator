@@ -41,6 +41,7 @@ function limitDigits(number, maxDigits) {
 numbers.forEach(number => {
     number.addEventListener("click", event => {
         const clickedNumber = event.target.textContent;
+        if (divideByZeroFlag) divideByZeroFlag = false;
         if (newNumberFlag && !equation.length) {
             previousValueDisplay.textContent = "\u00A0"
             currentValueDisplay.textContent = 
