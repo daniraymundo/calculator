@@ -68,12 +68,10 @@ operators.forEach(operator => {
         let currentValue = currentValueDisplay.textContent;
 
         if (divideByZeroFlag) return;
-
         if (newNumberFlag) {
             previousValueDisplay.textContent = "";
             equation = [];
         }
-
         if (!equation.length) {
             currentValue = removeTrailingDecimal(currentValue);
             equation.push(currentValue, operator);
@@ -124,7 +122,7 @@ equals.addEventListener("click", () => {
     isDecimalClicked = false;
 });
 
-clear.forEach(btn => {
+clear.forEach(btn => { //to fix
     btn.addEventListener("click", event => {
         currentValueDisplay.textContent = "0";
         if (event.target.classList.contains("all")) {
@@ -176,6 +174,154 @@ decimal.addEventListener ("click", event => {
     }
     isDecimalClicked = true;
 })
+
+document.addEventListener("keydown", event => {
+    const key = event.key;
+
+    if(
+        !isNaN(key) ||
+        key === "." ||
+        key === "+" ||
+        key === "-" ||
+        key === "*" ||
+        key === "/" ||
+        key === "Enter" ||
+        key === "Backspace" ||
+        key === "Delete" ||
+        key === "Escape"
+    ){
+        event.preventDefault();
+
+        if (!isNaN(key) || key === ".") {
+            handleNumberKey(key);
+        } else if (key === "+" || key === "-" || key === "*" || key === "/") {
+            handleOperatorKey(key);
+        } else if (key === "Enter") {
+            handleEqualsKey();
+        } else if (key === "Backspace") {
+            handleBackspaceKey();
+        } else if (key === "Delete") {
+            handleDeleteKey();
+        } else if (key === "Escape") {
+            handleEscapeKey();
+        }
+    }
+})
+
+function handleNumberKey(key) {
+    if (divideByZeroFlag) divideByZeroFlag = false;
+    if (newNumberFlag && !equation.length) {
+            previousValueDisplay.textContent = "\u00A0"
+            currentValueDisplay.textContent = 
+                currentValueDisplay.textContent == result 
+                    ? key
+                    : limitDigits(`${currentValueDisplay.textContent}${key}`, 13);
+            newClickedNumber = currentValueDisplay.textContent;
+        } else if (newNumberFlag) {
+            currentValueDisplay.textContent = key;
+            newNumberFlag = false;
+        } else {
+            currentValueDisplay.textContent = 
+                currentValueDisplay.textContent == "0" 
+                    ? key 
+                    : limitDigits(`${currentValueDisplay.textContent}${key}`, 13);
+        }
+}
+
+function handleOperatorKey(key) {
+    const operator = (key === "/") ? "÷" : (key === "*") ? "x" : key;
+    let currentValue = currentValueDisplay.textContent;
+
+    if (divideByZeroFlag) return;
+    if (newNumberFlag) {
+        previousValueDisplay.textContent = "";
+        equation = [];
+    }
+    if (!equation.length) {
+        currentValue = removeTrailingDecimal(currentValue);
+        equation.push(currentValue, operator);
+        previousValueDisplay.textContent = `${currentValue} ${operator}`;
+    } else {
+        currentValue = removeTrailingDecimal(currentValue);
+        equation.push(currentValue);
+        const result = calculate(equation[0], equation[1], equation[2]);
+        currentValueDisplay.textContent = result;
+        previousValueDisplay.textContent = `${result} ${operator}`;
+        equation = [result, operator];
+    }
+    isDecimalClicked = false;
+    lastOperator = operator;
+    newNumberFlag = true;
+}
+
+function handleEqualsKey() {
+    if (divideByZeroFlag) return;
+    if (!equation.length && previousEquation.length && currentValueDisplay.textContent == result) {
+        equation = [...previousEquation]
+        newResult = calculate(result, equation[1], equation[2]);
+        currentValueDisplay.textContent = newResult;
+        previousValueDisplay.textContent = `${result} ${equation[1]} ${equation[2]} =`;
+        previousEquation = [];
+        previousEquation.push(result, equation[1], equation[2]);
+        result = newResult;
+    } else if (!equation.length && previousEquation.length) {
+        equation = [...previousEquation]
+        newResult = calculate(newClickedNumber, equation[1], equation[2]);
+        currentValueDisplay.textContent = newResult;
+        previousValueDisplay.textContent = `${newClickedNumber} ${equation[1]} ${equation[2]} =`;
+        previousEquation = [];
+        previousEquation.push(newClickedNumber, equation[1], equation[2]);
+        result = newResult;
+    } else if (!equation.length)  {
+        previousValueDisplay.textContent = `${currentValueDisplay.textContent} =`;
+    } else if (equation.length) {
+        equation.push(removeTrailingDecimal(currentValueDisplay.textContent));
+        result = calculate(equation[0], equation[1], equation[2]);
+        currentValueDisplay.textContent = result;
+        previousValueDisplay.textContent = `${equation[0]} ${equation[1]} ${equation[2]} =`;
+        previousEquation = [...equation]
+    }
+    equation = [];
+    newNumberFlag = true;
+    isDecimalClicked = false;
+}
+
+function handleBackspaceKey() {
+    if (currentValueDisplay.textContent === "Cannot divide by zero") {
+        currentValueDisplay.textContent = "0";
+        previousValueDisplay.textContent = "\u00A0";
+        equation = []
+        previousEquation = []
+        newNumberFlag = false;
+    }
+    if (previousEquation.length) {
+        previousValueDisplay.textContent = "\u00A0";
+    } else {
+        if (currentValueDisplay.textContent.length == 1) {
+            currentValueDisplay.textContent = "0";
+        } else {
+            currentValueDisplay.textContent = currentValueDisplay.textContent.slice(0, -1);
+        }
+    }
+    isDecimalClicked = false;
+    divideByZeroFlag = false;
+}
+
+function handleDeleteKey() { //to fix
+    currentValueDisplay.textContent = "0";
+    divideByZeroFlag = false;
+}
+
+function handleEscapeKey() {
+    currentValueDisplay.textContent = "0";
+    previousValueDisplay.textContent = "\u00A0";
+    equation = [];
+    previousEquation = [];
+    newNumberFlag = false;
+    isDecimalClicked = false;
+    divideByZeroFlag = false;
+}
+
 function calculate(operand1, operator, operand2) {
     operand1 = parseFloat(operand1);
     operand2 = parseFloat(operand2);
