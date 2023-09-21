@@ -45,10 +45,14 @@ numbers.forEach(number => {
         if (newNumberFlag && !equation.length) {
             previousValueDisplay.textContent = "\u00A0"
             currentValueDisplay.textContent = 
-                currentValueDisplay.textContent == result 
+                currentValueDisplay.textContent == result
                     ? clickedNumber 
                     : limitDigits(`${currentValueDisplay.textContent}${clickedNumber}`, 13);
             newClickedNumber = currentValueDisplay.textContent;
+            console.log(`isDecimalClicked = ${isDecimalClicked}`);
+            console.log(`equation = ${equation}`)
+            console.log(`previous equation = ${previousEquation}`);
+            console.log(`new clicked number = ${newClickedNumber}`);
         } else if (newNumberFlag) {
             currentValueDisplay.textContent = (clickedNumber);
             newNumberFlag = false;
@@ -122,17 +126,20 @@ equals.addEventListener("click", () => {
     isDecimalClicked = false;
 });
 
-clear.forEach(btn => { //to fix
+clear.forEach(btn => {
     btn.addEventListener("click", event => {
         currentValueDisplay.textContent = "0";
-        if (event.target.classList.contains("all")) {
+        isDecimalClicked = false;
+        divideByZeroFlag = false;
+        if (result) {
+            result = 0;
             previousValueDisplay.textContent = "\u00A0";
             equation = [];
+        }
+        if (event.target.classList.contains("all")) {
             previousEquation = [];
             newNumberFlag = false;
-            isDecimalClicked = false;
         }
-        divideByZeroFlag = false;
     });
 });
 
@@ -165,11 +172,13 @@ signChange.addEventListener("click", () => {
 
 decimal.addEventListener ("click", event => {
     if (!equation.length && previousEquation.length && !isDecimalClicked) {
-        currentValueDisplay.textContent = "0";
+        if (newClickedNumber !== "0") {
+            newClickedNumber += event.target.textContent;
+            currentValueDisplay.textContent = newClickedNumber
+        }
+        currentValueDisplay.textContent = "0."
         previousValueDisplay.textContent = "\u00A0";
-    }
-
-    if (!isDecimalClicked) {
+    } else if (!isDecimalClicked) {
         currentValueDisplay.textContent += event.target.textContent
     }
     isDecimalClicked = true;
@@ -192,8 +201,10 @@ document.addEventListener("keydown", event => {
     ){
         event.preventDefault();
 
-        if (!isNaN(key) || key === ".") {
+        if (!isNaN(key)) {
             handleNumberKey(key);
+        } else if (key === ".") {
+            handleDecimalKey(key);
         } else if (key === "+" || key === "-" || key === "*" || key === "/") {
             handleOperatorKey(key);
         } else if (key === "Enter") {
@@ -226,6 +237,20 @@ function handleNumberKey(key) {
                     ? key 
                     : limitDigits(`${currentValueDisplay.textContent}${key}`, 13);
         }
+}
+
+function handleDecimalKey(key) {
+    if (!equation.length && previousEquation.length && !isDecimalClicked) {
+        if (newClickedNumber !== "0") {
+            newClickedNumber += key;
+            currentValueDisplay.textContent = newClickedNumber
+        }
+        currentValueDisplay.textContent = "0."
+        previousValueDisplay.textContent = "\u00A0";
+    } else if (!isDecimalClicked) {
+        currentValueDisplay.textContent += key;
+    }
+    isDecimalClicked = true;
 }
 
 function handleOperatorKey(key) {
@@ -307,9 +332,15 @@ function handleBackspaceKey() {
     divideByZeroFlag = false;
 }
 
-function handleDeleteKey() { //to fix
+function handleDeleteKey() {
     currentValueDisplay.textContent = "0";
+    isDecimalClicked = false;
     divideByZeroFlag = false;
+    if (result) {
+        result = 0;
+        previousValueDisplay.textContent = "\u00A0";
+        equation = [];
+    }
 }
 
 function handleEscapeKey() {
