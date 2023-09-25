@@ -202,6 +202,12 @@ function handleEscapeKey() {
     divideByZeroFlag = false;
 };
 
+function handleSignChangeKey() {
+    currentValueDisplay.textContent = parseFloat(currentValueDisplay.textContent) * -1;
+    result = parseFloat(result) * -1;
+    newClickedNumber = parseFloat(newClickedNumber) * -1;
+};
+
 
 numbers.forEach(number => {
     number.addEventListener("click", event => {
@@ -227,11 +233,7 @@ clearEntry.addEventListener("click", handleDeleteKey);
 
 clearAll.addEventListener("click", handleEscapeKey);
 
-signChange.addEventListener("click", () => { // no keyboard support for sign change button
-    currentValueDisplay.textContent = parseFloat(currentValueDisplay.textContent) * -1;
-    result = parseFloat(result) * -1;
-    newClickedNumber = parseFloat(newClickedNumber) * -1;
-});
+signChange.addEventListener("click", handleSignChangeKey);
 
 document.addEventListener("keydown", event => {
     const key = event.key;
@@ -246,7 +248,9 @@ document.addEventListener("keydown", event => {
         key === "Enter" ||
         key === "Backspace" ||
         key === "Delete" ||
-        key === "Escape"
+        key === "Escape"||
+        key === "n"||
+        key === "N"
     ){
         event.preventDefault();
 
@@ -264,6 +268,8 @@ document.addEventListener("keydown", event => {
             handleDeleteKey();
         } else if (key === "Escape") {
             handleEscapeKey();
+        } else if (key === "n" || key === "N"){
+            handleSignChangeKey()
         };
     };
 });
