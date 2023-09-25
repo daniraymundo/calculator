@@ -38,6 +38,7 @@ body {
     border-radius: 0.75rem;
     background-color: var(--bgcolor1);
     width: 250px;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
 }
 
 .display-container {
@@ -80,13 +81,23 @@ button {
     font-family: inherit;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    transition: background-color 0.07s ease-in-out;
+    transition: transform 0.07s;
+}
+
+.decimal,
+.sign {
+    background-color: rgba(64, 64, 64, 0.65);
 }
 
 .number:hover,
 .decimal:hover,
-.sign:hover {
+.sign:hover,
+.number.active,
+.decimal.active,
+.sign.active {
     background-color: #6a6a6a;
+    transform: scale(1.05);
 }
 
 .backspace {
@@ -106,31 +117,36 @@ button {
 }
 
 .equals:hover,
-.operator:hover {
+.operator:hover,
+.equals.active,
+.operator.active {
     background-color: #FF898A;
+    transform: scale(1.05);
 }
 
-.clear,
+.clear-all,
+.clear-entry,
 .backspace {
     background-color: var(--accent-color3);
     color: black;
-    transition: background-color 0.3s ease-in-out;
 }
 
-.clear:hover,
-.backspace:hover {
+.clear-entry:hover,
+.clear-all:hover,
+.backspace:hover,
+.clear-entry.active,
+.clear-all.active,
+.backspace.active {
     background-color: #0079A8;
+    transform: scale(1.05);
 }
 
-.decimal,
-.sign {
-    background-color: rgba(64, 64, 64, 0.65);
-}
 
 footer {
     position: fixed;
     bottom: 0;
     font-size: 1rem;
+    font-weight: 500;
     color: var(--bgcolor1)
 }
 
