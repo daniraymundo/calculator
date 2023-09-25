@@ -8,10 +8,11 @@ const clearAll = document.querySelector(".clear-all");
 const backspace = document.querySelector(".backspace");
 const signChange = document.querySelector(".sign");
 const decimal = document.querySelector(".decimal");
+const buttons = document.querySelectorAll("button");
 let equation = [];
 let previousEquation = [];
 let newNumberFlag = false;
-let isDecimalClicked = false; //flag variable to prevent using of decimal point more than once in a given number
+let isDecimalClicked = false; //flag variable to prevent using decimal point more than once in the same number
 let divideByZeroFlag = false;
 let lastOperator = null;
 let result;
@@ -65,8 +66,8 @@ function limitDigits (number, maxDigits) { // limits digits to avoid overflow in
         return numToStr.slice(0, maxDigits);
     } else {
         return numToStr;
-    }
-}
+    };
+};
 
 function handleNumberKey(key) {
     if (divideByZeroFlag) divideByZeroFlag = false;
@@ -208,6 +209,10 @@ function handleSignChangeKey() {
     newClickedNumber = parseFloat(newClickedNumber) * -1;
 };
 
+function removeTransition(e) {
+    if (e.propertyName !== "transform") return;
+    this.classList.remove("active");
+};
 
 numbers.forEach(number => {
     number.addEventListener("click", event => {
@@ -238,20 +243,9 @@ signChange.addEventListener("click", handleSignChangeKey);
 document.addEventListener("keydown", event => {
     const key = event.key;
 
-    if(
-        !isNaN(key) ||
-        key === "." ||
-        key === "+" ||
-        key === "-" ||
-        key === "*" ||
-        key === "/" ||
-        key === "Enter" ||
-        key === "Backspace" ||
-        key === "Delete" ||
-        key === "Escape"||
-        key === "n"||
-        key === "N"
-    ){
+    const button = document.querySelector(`button[data-key="${key}"]`);
+    
+    if(button) {
         event.preventDefault();
 
         if (!isNaN(key)) {
@@ -268,8 +262,14 @@ document.addEventListener("keydown", event => {
             handleDeleteKey();
         } else if (key === "Escape") {
             handleEscapeKey();
-        } else if (key === "n" || key === "N"){
+        } else if (key === "n"){
             handleSignChangeKey()
         };
+
+        button.classList.add("active");
     };
+});
+
+buttons.forEach(button => {
+    button.addEventListener("transitionend", removeTransition)
 });
