@@ -11,7 +11,7 @@ const decimal = document.querySelector(".decimal");
 let equation = [];
 let previousEquation = [];
 let newNumberFlag = false;
-let isDecimalClicked = false;
+let isDecimalClicked = false; //flag variable to prevent using of decimal point more than once in a given number
 let divideByZeroFlag = false;
 let lastOperator = null;
 let result;
@@ -39,33 +39,34 @@ function calculate(operand1, operator, operand2) {
         };
     };
 
-    if (Math.abs(result) >= 1e+16) {
+    if (Math.abs(result) >= 1e+16) { //uses scientific notation for big numbers
         return result.toExponential(6);
-    } else {
-        return limitDigits(result, 13);
+    } else { //formats calcuation result according to number of decimal places of operands
+        if (Number.isInteger(result)) { //removes trailing zeros for whole numbers
+            return result.toString();
+        } else {
+            const decimalPlacesOperand1 = (operand1.toString().split(".")[1] || "").length;
+            const decimalPlacesOperand2 = (operand2.toString().split(".")[1] || "").length;
+            const maxDecimalPlaces = Math.max(decimalPlacesOperand1, decimalPlacesOperand2);
+
+            return limitDigits ((result.toFixed(maxDecimalPlaces)), 13);
+        };
     };
 };
 
-function removeTrailingDecimal(str) {
+function removeTrailingDecimal(str) { // ensures calculation continues when number entered ends with decimal point
     return str.endsWith(".") ? str.slice(0,-1) : str;
 };
 
-function limitDigits(number, maxDigits) {
+function limitDigits (number, maxDigits) { // limits digits to avoid overflow in the display
     const numToStr = number.toString();
 
     if (numToStr.length > maxDigits) {
-        const [integerPart, decimalPart] = numToStr.split(".");
-
-        if (decimalPart) {
-            const maxDecimalLength = maxDigits - integerPart.length - 1; 
-            const roundedDecimalPart = parseFloat(`0.${decimalPart}`).toFixed(maxDecimalLength).split(".")[1];
-            return (`${integerPart}.${roundedDecimalPart}`);
-        } else {
-            return parseFloat(integerPart.slice(0, maxDigits));
-        };
-    };
-    return numToStr;
-};
+        return numToStr.slice(0, maxDigits);
+    } else {
+        return numToStr;
+    }
+}
 
 function handleNumberKey(key) {
     if (divideByZeroFlag) divideByZeroFlag = false;
@@ -129,7 +130,7 @@ function handleOperatorKey(key) {
 
 function handleEqualsKey() {
     if (divideByZeroFlag) return;
-    if (!equation.length && previousEquation.length && currentValueDisplay.textContent == result) {
+    if (!equation.length && previousEquation.length && currentValueDisplay.textContent == result) { //allows result of previous calculation to be used in next calculation
         equation = [...previousEquation]
         newResult = calculate(result, equation[1], equation[2]);
         currentValueDisplay.textContent = newResult;
@@ -137,7 +138,7 @@ function handleEqualsKey() {
         previousEquation = [];
         previousEquation.push(result, equation[1], equation[2]);
         result = newResult;
-    } else if (!equation.length && previousEquation.length) {
+    } else if (!equation.length && previousEquation.length) { //allows new number to be used in previous calculation
         equation = [...previousEquation]
         newResult = calculate(newClickedNumber, equation[1], equation[2]);
         currentValueDisplay.textContent = newResult;
@@ -226,7 +227,7 @@ clearEntry.addEventListener("click", handleDeleteKey);
 
 clearAll.addEventListener("click", handleEscapeKey);
 
-signChange.addEventListener("click", () => {
+signChange.addEventListener("click", () => { // no keyboard support for sign change button
     currentValueDisplay.textContent = parseFloat(currentValueDisplay.textContent) * -1;
     result = parseFloat(result) * -1;
     newClickedNumber = parseFloat(newClickedNumber) * -1;
