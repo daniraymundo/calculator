@@ -147,7 +147,8 @@ footer {
     bottom: 0;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--bgcolor1)
+    color: var(--bgcolor1);
+    text-align: center;
 }
 
 a:visited {
